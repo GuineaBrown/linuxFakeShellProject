@@ -1,0 +1,3 @@
+# diskName nBlocks nBytesPerSector maxFnm nInodes iNodeHt
+D1             128             512      8      20       3
+D2            1024             256     16     100       8

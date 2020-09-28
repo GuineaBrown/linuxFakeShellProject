@@ -1,0 +1,11 @@
+# stdTestScriptP0.txt
+!rm -f test
+mkfs D2
+ls
+ls > test
+ls | cat
+!cat test
+!time
+!sleep 15 &
+!time
+quit

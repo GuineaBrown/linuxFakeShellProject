@@ -1,0 +1,470 @@
+Script started on 2020-09-24 21:31:38+1000
+\]0;brownie@brownie-VirtualBox: ~/Documents/thuyShell/source/P0-2020-Fall[01;32mbrownie@brownie-VirtualBox[00m:[01;34m~/Documents/thuyShell/source/P0-2020-Fall[00m$ \[Kls
+bitvector.cpp  diskParams.dat  inodes.o   shell.cpp    user.cpp
+bitvector.o    file.cpp        Makefile   shell.o      volume.cpp
+D1.dsk         file.o          mount.cpp  simdisk.cpp  volume.o
+directory.cpp  fs33types.hpp   mount.o    simdisk.o
+directory.o    inodes.cpp      [0m[01;32mP0[0m         typescript
+]0;brownie@brownie-VirtualBox: ~/Documents/thuyShell/source/P0-2020-Fall[01;32mbrownie@brownie-VirtualBox[00m:[01;34m~/Documents/thuyShell/source/P0-2020-Fall[00m$ gdb P0
+GNU gdb (Ubuntu 8.1-0ubuntu3.2) 8.1.0.20180409-git
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from P0...done.
+(gdb) run
+Starting program: /home/brownie/Documents/thuyShell/source/P0-2020-Fall/P0 
+The shell has only the following cmds:
+	cd	s
+	cp	ss
+	echo	ssss
+	inode	u
+	ls	
+	lslong	
+	mkdir	s
+	mkdisk	s
+	mkfs	s
+	mount	us
+	mount	
+	mv	ss
+	rddisk	su
+	rmdir	s
+	rm	s
+	pwd	
+	q	
+	quit	
+	umount	u
+	wrdisk	sus
+Start with ! to invoke a Unix shell cmd
+sh33% quit    ls
+cmd [ls]
+Cmd ls needs the cfv to be != 0.
+sh33% u qui u it
+cmd [quit]
+[Inferior 1 (process 2817) exited normally]
+(gdb) 
+(gdb) 
+(gdb) 
+(gdb) 
+(gdb) 
+(gdb) 
+(gdb) 357[K[K[Kbreak 357
+Breakpoint 1 at 0x5555555597f7: file shell.cpp, line 357.
+(gdb) run
+Starting program: /home/brownie/Documents/thuyShell/source/P0-2020-Fall/P0 
+
+Breakpoint 1, main () at shell.cpp:359
+359	  usage();
+(gdb) p buf
+$1 = "p\341\377\367\377\177\000\000\023O\336\367\377\177\000\000\001", '\000' <repeats 15 times>, "\060GM\367\377\177\000\000\270U\335\367\377\177\000\000\340\336\377\377\377\177\000\000Z\307\336\367\377\177\000\000\240\354\202\367\377\177\000\000`\364\202\367\377\177\000\000\320=M\367\377\177\000\000\030\337\377\377\377\177\000\000\025\000\000\000\000\000\000\000\350nD\367\377\177\000\000\200\005P\367\377\177\000\000xR\334\367\377\177\000\000p\341\377\367\377\177\000\000\023O\336\367\377\177\000\000\001\000\000\000\000\000\000\000\200\037\000\000\377\377\000\000\200T\335\367\377\177\000\000 \342D\367\377\177\000\000p\337\377\377\377\177\000\000Z\307\336\367\377\177\000\000p\v\335\367\377\177\000\000"...
+(gdb) p arg
+$2 = {{s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {
+    s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {
+    s = 0x0, u = 0}, {s = 0x0, u = 0}}
+(gdb) step
+usage () at shell.cpp:270
+270	  printf("The shell has only the following cmds:\n");
+(gdb) nex[K[K[Kstep
+_IO_puts (str=0x555555559f90 "The shell has only the following cmds:")
+    at ioputs.c:33
+33	ioputs.c: No such file or directory.
+(gdb) fin
+Run till exit from #0  _IO_puts (
+    str=0x555555559f90 "The shell has only the following cmds:") at ioputs.c:33
+The shell has only the following cmds:
+usage () at shell.cpp:271
+271	  for (uint i = 0; i < ncmds; i++)
+Value returned is $3 = 39
+(gdb) step
+272	    printf("\t%s\t%s\n", cmdTable[i].cmdName, cmdTable[i].argsRequired);
+(gdb) fin
+Run till exit from #0  usage () at shell.cpp:272
+	cd	s
+	cp	ss
+	echo	ssss
+	inode	u
+	ls	
+	lslong	
+	mkdir	s
+	mkdisk	s
+	mkfs	s
+	mount	us
+	mount	
+	mv	ss
+	rddisk	su
+	rmdir	s
+	rm	s
+	pwd	
+	q	
+	quit	
+	umount	u
+	wrdisk	sus
+Start with ! to invoke a Unix shell cmd
+main () at shell.cpp:361
+361	    *buf = 0;			// clear old input
+(gdb) ne[Kw[Kext
+362	    printf("%s", "sh33% ");	// prompt
+(gdb) next
+363	    ourgets(buf);
+(gdb) next
+sh33% mkfs D1
+364	    printf("cmd [%s]\n", buf);	// just print out what we got as-is
+(gdb) p buf
+$4 = "mkfs D1\000\000O\336\367\377\177\000\000\001", '\000' <repeats 15 times>, "\060GM\367\377\177\000\000\270U\335\367\377\177\000\000\340\336\377\377\377\177\000\000Z\307\336\367\377\177\000\000\240\354\202\367\377\177\000\000`\364\202\367\377\177\000\000\320=M\367\377\177\000\000\030\337\377\377\377\177\000\000\025\000\000\000\000\000\000\000\350nD\367\377\177\000\000\200\005P\367\377\177\000\000xR\334\367\377\177\000\000p\341\377\367\377\177\000\000\023O\336\367\377\177\000\000\001\000\000\000\000\000\000\000\200\037\000\000\377\377\000\000\200T\335\367\377\177\000\000 \342D\367\377\177\000\000p\337\377\377\377\177\000\000Z\307\336\367\377\177\000\000p\v\335\367\377\177\000\000"...
+(gdb) next
+cmd [mkfs D1]
+365	    if (buf[0] == 0)
+(gdb) next
+367	    if (buf[0] == '#')
+(gdb) next[K[K[K[K
+369	    if (buf[0] == '!')		// begins with !, execute it as
+(gdb) 
+372	      setArgsGiven(buf, arg, types, nArgsMax);
+(gdb) step
+setArgsGiven (buf=0x7fffffffdb00 "mkfs D1", arg=0x55555575c2e0 <arg>, 
+    types=0x55555575c2d0 <types> "", nMax=10) at shell.cpp:315
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) ste[K[K[K
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+316	    arg[i].s = 0;
+(gdb) 
+317	    types[i] = 0;
+(gdb) 
+315	  for (uint i = 0; i < nMax; i++) {
+(gdb) 
+319	  types[nMax] = 0;
+(gdb) 
+321	  strtok(buf, " \t\n");		// terminates the cmd name with a \0
+(gdb) 
+
+strtok (s=0x7fffffffdb00 "mkfs D1", delim=0x55555555a080 " \t\n")
+    at strtok.c:34
+34	strtok.c: No such file or directory.
+(gdb) 
+__GI___strtok_r (s=0x7fffffffdb00 "mkfs D1", delim=0x55555555a080 " \t\n", 
+    save_ptr=0x7ffff7830a68 <olds>) at strtok_r.c:46
+46	strtok_r.c: No such file or directory.
+(gdb) fin
+Run till exit from #0  __GI___strtok_r (s=0x7fffffffdb00 "mkfs D1", 
+    delim=0x55555555a080 " \t\n", save_ptr=0x7ffff7830a68 <olds>)
+    at strtok_r.c:46
+setArgsGiven (buf=0x7fffffffdb00 "mkfs", arg=0x55555575c2e0 <arg>, 
+    types=0x55555575c2d0 <types> "", nMax=10) at shell.cpp:323
+323	  for (uint i = 0; i < nMax;) {
+Value returned is $5 = 0x7fffffffdb00 "mkfs"
+(gdb) next
+324	      char *q = strtok(0, " \t");
+(gdb) 
+325	      if (q == 0 || *q == 0) break;
+(gdb) 
+326	      arg[i].s = q;
+(gdb) 
+327	      arg[i].u = toNum(q);
+(gdb) step
+toNum (p=0x7fffffffdb05 "D1") at shell.cpp:53
+53	  return (p != 0 && '0' <= *p && *p <= '9' ? atoi(p) : 0);
+(gdb) next
+54	}
+(gdb) next
+setArgsGiven (buf=0x7fffffffdb00 "mkfs", arg=0x55555575c2e0 <arg>, 
+    types=0x55555575c2d0 <types> "", nMax=10) at shell.cpp:328
+328	      types[i] = isDigit(*q)? 'u' : 's';
+(gdb) step
+isDigit (c=68 'D') at shell.cpp:42
+42	  return '0' <= c && c <= '9';
+(gdb) fin
+Run till exit from #0  isDigit (c=68 'D') at shell.cpp:42
+0x00005555555596de in setArgsGiven (buf=0x7fffffffdb00 "mkfs", 
+    arg=0x55555575c2e0 <arg>, types=0x55555575c2d0 <types> "", nMax=10)
+    at shell.cpp:328
+328	      types[i] = isDigit(*q)? 'u' : 's';
+Value returned is $6 = 0
+(gdb) next
+329	      nArgs = ++i;
+(gdb) p [K Arg
+Attempt to use a type name as an expression
+(gdb) p arg
+$7 = (Arg *) 0x55555575c2e0 <arg>
+(gdb) next[K[K[K[Kp *arg
+$8 = {s = 0x7fffffffdb05 "D1", u = 0}
+(gdb) next
+323	  for (uint i = 0; i < nMax;) {
+(gdb) 
+324	      char *q = strtok(0, " \t");
+(gdb) 
+325	      if (q == 0 || *q == 0) break;
+(gdb) 
+331	}
+(gdb) 
+main () at shell.cpp:373
+373	      int k = findCmd(buf, types);
+(gdb) step
+findCmd (name=0x7fffffffdb00 "mkfs", argtypes=0x55555575c2d0 <types> "s")
+    at shell.cpp:340
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) next
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) next
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) p name
+$9 = 0x7fffffffdb00 "mkfs"
+(gdb) next
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) p i
+$10 = 6
+(gdb) next
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+340	  for (uint i = 0; i < ncmds; i++) {
+(gdb) 
+341	    if (strcmp(name, cmdTable[i].cmdName) == 0
+(gdb) 
+342		&& strcmp(argtypes, cmdTable[i].argsRequired) == 0) {
+(gdb) 
+343	      return i;
+(gdb) 
+347	}
+(gdb) fin
+Run till exit from #0  findCmd (name=0x7fffffffdb00 "mkfs", 
+    argtypes=0x55555575c2d0 <types> "s") at shell.cpp:347
+0x00005555555598be in main () at shell.cpp:373
+373	      int k = findCmd(buf, types);
+Value returned is $11 = 8
+(gdb) main[K[K[K[Knext
+374	      if (k >= 0)
+(gdb) 
+375		invokeCmd(k, arg);
+(gdb) step
+invokeCmd (k=8, arg=0x55555575c2e0 <arg>) at shell.cpp:282
+282	  uint ok = 1;
+(gdb) nmext[K[K[K[Kext
+283	  if (cmdTable[k].globalsNeeded[0] == 'v' && cwdVNIN == 0) {
+(gdb) 
+287	  else if (cmdTable[k].globalsNeeded[0] == 'm' && mtab == 0) {
+(gdb) 
+292	  char *req = cmdTable[k].argsRequired;
+(gdb) p cmdTable[k].argsRequired
+$12 = 0x555555559f19 "s"
+(gdb) next
+293	  uint na = strlen(req);
+(gdb) 
+294	  for (uint i = 0; i < na; i++) {
+(gdb) 
+295	    if (req[i] == 's' && (arg[i].s == 0 || arg[i].s[0] == 0)) {
+(gdb) 
+299	    if ((req[i] == 'u') && (arg[i].s == 0 || !isDigit(arg[i].s[0]))) {
+(gdb) 
+294	  for (uint i = 0; i < na; i++) {
+(gdb) 
+304	  if (ok)
+(gdb) p ok
+$13 = 1
+(gdb) next
+305	    (*cmdTable[k].func) (arg);
+(gdb) p *cmdTable[k].func)(*cmdTable[k].func)[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C (arg)
+make33fv() = 0x55555576f8f0, Name == D1, Disk# == 2
+$14 = void
+(gdb) step
+doMakeFV (a=0x55555575c2e0 <arg>) at shell.cpp:120
+120	  SimDisk * simDisk = mkSimDisk((byte *) a[0].s);
+(gdb) next[K[K[K[Kste[[Kp
+mkSimDisk (name=0x7fffffffdb05 "D1") at shell.cpp:58
+58	  SimDisk * simDisk = new SimDisk(name, 0);
+(gdb) 
+SimDisk::SimDisk (this=0x555555770640, diskName=0x7fffffffdb05 "D1", 
+    diskNumber=0) at simdisk.cpp:52
+52	SimDisk::SimDisk(byte * diskName, uint diskNumber)
+(gdb) fin
+Run till exit from #0  SimDisk::SimDisk (this=0x555555770640, 
+    diskName=0x7fffffffdb05 "D1", diskNumber=0) at simdisk.cpp:52
+0x0000555555558b4c in mkSimDisk (name=0x7fffffffdb05 "D1") at shell.cpp:58
+58	  SimDisk * simDisk = new SimDisk(name, 0);
+(gdb) next
+59	  if (simDisk->nSectorsPerDisk == 0) {
+(gdb) 
+64	  return simDisk;
+(gdb) fin
+Run till exit from #0  mkSimDisk (name=0x7fffffffdb05 "D1") at shell.cpp:64
+0x0000555555558f18 in doMakeFV (a=0x55555575c2e0 <arg>) at shell.cpp:120
+120	  SimDisk * simDisk = mkSimDisk((byte *) a[0].s);
+Value returned is $15 = (SimDisk *) 0x555555770640
+(gdb) next
+121	  if (simDisk == 0)
+(gdb) p simDisk
+$16 = (SimDisk *) 0x555555770640
+(gdb) 
+$17 = (SimDisk *) 0x555555770640
+(gdb) p simDisk[C[C[C[C[C[C[5Pnext
+123	  fv = simDisk->make33fv();
+(gdb) step
+SimDisk::make33fv (this=0x555555770640) at simdisk.cpp:130
+130	  return nSectorsPerDisk > 0
+(gdb) p nSectir[K[KorPerDisk
+No symbol "nSectorPerDisk" in current context.
+(gdb) p nSectorPerDisk[CsPerDisk
+$18 = 128
+(gdb) next
+131	    ? new FileVolume(this,
+(gdb) 
+134	                     1) : 0;
+(gdb) 
+131	    ? new FileVolume(this,
+(gdb) 
+134	                     1) : 0;
+(gdb) 
+135	}
+(gdb) 
+doMakeFV (a=0x55555575c2e0 <arg>) at shell.cpp:124
+124	  printf("make33fv() = %p, Name == %s, Disk# == %d\n",
+(gdb) 
+make33fv() = 0x555555770670, Name == D1, Disk# == 2
+127	  if (fv) {
+(gdb) 
+128	      wd = new Directory(fv, 1, 0);
+(gdb) 
+129	      cwdVNIN = mkVNIN(simDisk->simDiskNum, 1);
+(gdb) next
+131	}
+(gdb) 
+invokeCmd (k=8, arg=0x55555575c2e0 <arg>) at shell.cpp:306
+306	}
+(gdb) 
+main () at shell.cpp:361
+361	    *buf = 0;			// clear old input
+(gdb) next
+362	    printf("%s", "sh33% ");	// prompt
+(gdb) 
+363	    ourgets(buf);
+(gdb) 
+sh33% !ls
+364	    printf("cmd [%s]\n", buf);	// just print out what we got as-is
+(gdb) next
+cmd [!ls]
+365	    if (buf[0] == 0)
+(gdb) 
+367	    if (buf[0] == '#')
+(gdb) 
+369	    if (buf[0] == '!')		// begins with !, execute it as
+(gdb) 
+370	      system(buf + 1);		// a normal shell cmd
+(gdb) p buf
+$19 = "!ls\000\000D1\000\000O\336\367\377\177\000\000\001", '\000' <repeats 15 times>, "\060GM\367\377\177\000\000\270U\335\367\377\177\000\000\340\336\377\377\377\177\000\000Z\307\336\367\377\177\000\000\240\354\202\367\377\177\000\000`\364\202\367\377\177\000\000\320=M\367\377\177\000\000\030\337\377\377\377\177\000\000\025\000\000\000\000\000\000\000\350nD\367\377\177\000\000\200\005P\367\377\177\000\000xR\334\367\377\177\000\000p\341\377\367\377\177\000\000\023O\336\367\377\177\000\000\001\000\000\000\000\000\000\000\200\037\000\000\377\377\000\000\200T\335\367\377\177\000\000 \342D\367\377\177\000\000p\337\377\377\377\177\000\000Z\307\336\367\377\177\000\000p\v\335\367\377\177\000\000"...
+(gdb) p arg
+$20 = {{s = 0x7fffffffdb05 "D1", u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {
+    s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}, {
+    s = 0x0, u = 0}, {s = 0x0, u = 0}, {s = 0x0, u = 0}}
+(gdb) p types
+$21 = "s\000\000\000\000\000\000\000\000\000"
+(gdb) p nArg
+No symbol "nArg" in current context.
+(gdb) p nArgtypes[1PnArg[Kp nArgs
+$22 = 1
+(gdb) p nArgs[Ktypes[2Pargbuf[1Pnext
+bitvector.cpp  diskParams.dat  inodes.o   shell.cpp    user.cpp
+bitvector.o    file.cpp        Makefile   shell.o      volume.cpp
+D1.dsk	       file.o	       mount.cpp  simdisk.cpp  volume.o
+directory.cpp  fs33types.hpp   mount.o	  simdisk.o
+directory.o    inodes.cpp      P0	  typescript
+361	    *buf = 0;			// clear old input
+(gdb) yes
+Undefined command: "yes".  Try "help".
+(gdb) quit[K[K[K[Kexit
+Undefined command: "exit".  Try "help".
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 2891] will be killed.
+
+Quit anyway? (y or n) y
+]0;brownie@brownie-VirtualBox: ~/Documents/thuyShell/source/P0-2020-Fall[01;32mbrownie@brownie-VirtualBox[00m:[01;34m~/Documents/thuyShell/source/P0-2020-Fall[00m$ stop
+
+Command 'stop' not found, but there are 18 similar ones.
+
+]0;brownie@brownie-VirtualBox: ~/Documents/thuyShell/source/P0-2020-Fall[01;32mbrownie@brownie-VirtualBox[00m:[01;34m~/Documents/thuyShell/source/P0-2020-Fall[00m$ exit
+exit
+
+Script done on 2020-09-24 22:15:16+1000

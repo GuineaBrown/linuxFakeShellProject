@@ -1,0 +1,37 @@
+p
+This is a test
+The shell has only the following cmds:
+	cd	s
+	cp	ss
+	echo	ssss
+	inode	u
+	ls	
+	lslong	
+	mkdir	s
+	mkdisk	s
+	mkfs	s
+	mount	us
+	mount	
+	mv	ss
+	rddisk	su
+	rmdir	s
+	rm	s
+	pwd	
+	q	
+	quit	
+	umount	u
+	wrdisk	sus
+Start with ! to invoke a Unix shell cmd
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% cmd [ls]
+Cmd ls needs the cfv to be != 0.
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% cmd []
+sh33% This is a test
