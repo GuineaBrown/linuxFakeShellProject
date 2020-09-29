@@ -3,9 +3,14 @@
  * pmateti@wright.edu
  */
 
+#define AMPERSANDFLAG 3
+#define PIPEFLAG 2
+#define REDIRECTFLAG 1
+
 #include "fs33types.hpp"
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -325,7 +330,7 @@ void setArgsGiven(char *buf, Arg *arg, char *types, uint nMax)
   strtok(buf, " \t\n");		// terminates the cmd name with a \0
 
   for (uint i = 0; i < nMax;) {
-      char *q = strtok(0, " \t");
+      char *q = strtok(0, " \t"); //recurse through to the next space
       if (q == 0 || *q == 0) break;
       arg[i].s = q;
       arg[i].u = toNum(q);
@@ -356,45 +361,66 @@ void ourgets(char *buf) {
   if (p) *p = 0;
 }
 
-bool isCarrot(char* buf) {
+int isSpecialChar(char* buf) {
    // Helper function to scan commands for ">" operator
+   int flag = 0;
+
 	while (*buf != '\0') {
 		if (*buf == '>') {
-			return true;
+			flag = REDIRECTFLAG;
+			break;
+		} else if (*buf == '|') {
+		    flag = PIPEFLAG;
+		    break;
+		} else if (*buf == '&') {
+		    flag = AMPERSANDFLAG;
+		    break;
 		}
-		buf++;
-	}
 
-	return false;
+		buf++;
+
+	}
+	return flag;
 }
 
-// split strings function
+void parseSpecialCommand(char* buf, char* rhs, int specialChar) {
+    // work in progress - map the specialChar to the character
+    strtok(buf, " > "); //terminate and section command
+    char *argsSpec[nArgsMax];
+
+    // to do, find the point where the actual commands stop!! and keep indexes
+    //args[0] = token;
+
+    for (uint i = 0; i < 10;) {
+      char *q = strtok(0, ">");
+      if (q == 0 || *q == 0) break;
+      argsSpec[i] = q;
+    }
+
+    // returns the fake shell command in buf, the otherside of the operator in rhs
+    strcpy(rhs, argsSpec[0]);
+
+}
+
 
 int main()
 {
   char buf[1024];		// better not type longer than 1023 chars
+  char rhs[1024];
 
-  usage();
+  //usage();
+
   for (;;) {
     *buf = 0;			// clear old input
     printf("%s", "sh33% ");	// prompt
     ourgets(buf);
-    printf("cmd [%s]\n", buf);	// just print out what we got as-is
-    
-    // redirection
-    if (isCarrot(buf)) {
-       int savedStdout = dup(1);
-       int file = open("testTxt.txt", O_WRONLY | O_APPEND);
-       
-       // do our printing tests to redirected STDOUT
-       cout << file << endl;
-       dup2(file, 1);
-       printf("This is a test\n");
 
-       // restore STDOUT to temrinal
-       dup2(savedStdout, 1);
-       close(savedStdout);
-       close(file);
+    // seperate this into the cmd, and whether there are special characters &,|,>
+    if (isSpecialChar(buf) != 0) {
+        parseSpecialCommand(buf, rhs, 1);
+        cout << "Detected special cmd: " << buf << " " << rhs << endl;
+    } else {
+        printf("cmd [%s]\n", buf);
     }
 
     if (buf[0] == 0)
@@ -407,9 +433,11 @@ int main()
       setArgsGiven(buf, arg, types, nArgsMax);
       int k = findCmd(buf, types);
       if (k >= 0)
-	invokeCmd(k, arg);
+        invokeCmd(k, arg);
+        // if theres a special character, invoke as part of a chain
+        //invokeCmd(k, arg);
       else
-	usage();
+	    usage();
     }
   }
 }
