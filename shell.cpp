@@ -9,6 +9,7 @@
 
 #include "fs33types.hpp"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -361,19 +362,19 @@ void ourgets(char *buf) {
   if (p) *p = 0;
 }
 
-int isSpecialChar(char* buf) {
-   // Helper function to scan commands for ">" operator
-   int flag = 0;
+char isSpecialChar(char* buf) {
+   // Helper function to scan commands for pipe, redirection and & operators
+   char flag = '0';
 
 	while (*buf != '\0') {
 		if (*buf == '>') {
-			flag = REDIRECTFLAG;
+			flag = '>';
 			break;
 		} else if (*buf == '|') {
-		    flag = PIPEFLAG;
+		    flag = '|';
 		    break;
 		} else if (*buf == '&') {
-		    flag = AMPERSANDFLAG;
+		    flag = '&';
 		    break;
 		}
 
@@ -383,16 +384,22 @@ int isSpecialChar(char* buf) {
 	return flag;
 }
 
-void parseSpecialCommand(char* buf, char* rhs, int specialChar) {
+
+
+void parseSpecialCommand(char* buf, char* rhs, char specialChar) {
+    // turn input operator char into a string for strtok purposes
+    char op[1] = {'0'};
+    op[0] = specialChar;
+
     // work in progress - map the specialChar to the character
-    strtok(buf, " > "); //terminate and section command
+    strtok(buf, op); //terminate and section command
     char *argsSpec[nArgsMax];
 
     // to do, find the point where the actual commands stop!! and keep indexes
     //args[0] = token;
 
     for (uint i = 0; i < 10;) {
-      char *q = strtok(0, ">");
+      char *q = strtok(0, op);
       if (q == 0 || *q == 0) break;
       argsSpec[i] = q;
     }
@@ -412,12 +419,15 @@ int main()
 
   for (;;) {
     *buf = 0;			// clear old input
+
     printf("%s", "sh33% ");	// prompt
     ourgets(buf);
 
     // seperate this into the cmd, and whether there are special characters &,|,>
-    if (isSpecialChar(buf) != 0) {
-        parseSpecialCommand(buf, rhs, 1);
+    char opType = isSpecialChar(buf);
+    cout << opType << endl;
+    if (opType != '0') {
+        parseSpecialCommand(buf, rhs, opType);
         cout << "Detected special cmd: " << buf << " " << rhs << endl;
     } else {
         printf("cmd [%s]\n", buf);
@@ -432,12 +442,46 @@ int main()
     else {
       setArgsGiven(buf, arg, types, nArgsMax);
       int k = findCmd(buf, types);
-      if (k >= 0)
-        invokeCmd(k, arg);
-        // if theres a special character, invoke as part of a chain
-        //invokeCmd(k, arg);
-      else
-	    usage();
+
+      // find command first, if it exists
+      if (k >= 0) {
+
+          switch (opType) {
+            case '0': // normal (no operator)
+                invokeCmd(k, arg);
+                break;
+            case '>': //REDIRECT
+                {
+                // Will change stdOut toward a file specified on the rhs of the '>' operator
+                cout << "REDIRECTING " << buf << "INTO " << rhs << endl;
+                int savedStdout = dup(1); //save stdOut before redirecting
+
+                // create file for writing and set STDOUT
+                ofstream tempFile;
+                tempFile.open(rhs);
+                tempFile.close();
+                int file = open(rhs, O_WRONLY | O_APPEND); //need to check that rhs is actuakly a file
+                dup2(file, 1);
+
+                invokeCmd(k, arg);
+
+                // memory cleanup and STDOUT back to console
+                dup2(savedStdout, 1);
+                close(savedStdout);
+                close(file);
+                break;
+                }
+            case '|': //PIPE
+                cout << "PIPING" << endl;
+                break;
+            case '&': // AMP
+                cout << "REDIRECTING TO " << endl;
+                break;
+            }
+
+        } else {
+	        usage();
+        }
     }
   }
 }
