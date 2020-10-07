@@ -19,7 +19,7 @@ OBJFILES = simdisk.o bitvector.o directory.o file.o \
   inodes.o volume.o mount.o shell.o
 
 $(PROJECT): $(OBJFILES)
-	g++ -o $(PROJECT) $(CFLAGS) $(OBJFILES)
+	g++ -o $(PROJECT) $(CFLAGS) $(OBJFILES) -pthread
 
 test:   $(PROJECT)
 	rm -fr D?.bin

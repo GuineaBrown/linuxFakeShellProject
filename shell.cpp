@@ -9,8 +9,10 @@
 
 #include "fs33types.hpp"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -33,6 +35,11 @@ public:
 } arg[nArgsMax];
 
 uint nArgs = 0;
+
+struct invokeCmdArgs {
+    int index;
+    Arg *arguments;
+};
 
 uint TODO()
 {
@@ -232,6 +239,11 @@ void doUmount(Arg * a)
   TODO("doUmount");
 }
 
+void doCat(Arg * a)
+{
+  TODO("doCat");
+}
+
 /* The following describes one entry in our table of commands.  For
  * each cmmdName (a null terminated string), we specify the arguments
  * it requires by a sequence of letters.  The letter s stands for
@@ -361,19 +373,19 @@ void ourgets(char *buf) {
   if (p) *p = 0;
 }
 
-int isSpecialChar(char* buf) {
-   // Helper function to scan commands for ">" operator
-   int flag = 0;
+char isSpecialChar(char* buf) {
+   // Helper function to scan commands for pipe, redirection and & operators
+   char flag = '0';
 
 	while (*buf != '\0') {
 		if (*buf == '>') {
-			flag = REDIRECTFLAG;
+			flag = '>';
 			break;
 		} else if (*buf == '|') {
-		    flag = PIPEFLAG;
+		    flag = '|';
 		    break;
 		} else if (*buf == '&') {
-		    flag = AMPERSANDFLAG;
+		    flag = '&';
 		    break;
 		}
 
@@ -383,24 +395,37 @@ int isSpecialChar(char* buf) {
 	return flag;
 }
 
-void parseSpecialCommand(char* buf, char* rhs, int specialChar) {
+void parseSpecialCommand(char* buf, char* rhs, char specialChar) {
+    // turn input operator char into a string for strtok purposes
+    char op[1] = {'0'};
+    op[0] = specialChar;
+
     // work in progress - map the specialChar to the character
-    strtok(buf, " > "); //terminate and section command
+    strtok(buf, op); //terminate and section command
     char *argsSpec[nArgsMax];
 
     // to do, find the point where the actual commands stop!! and keep indexes
     //args[0] = token;
 
     for (uint i = 0; i < 10;) {
-      char *q = strtok(0, ">");
+      char *q = strtok(0, op);
       if (q == 0 || *q == 0) break;
       argsSpec[i] = q;
     }
 
     // returns the fake shell command in buf, the otherside of the operator in rhs
-    strcpy(rhs, argsSpec[0]);
+    if (argsSpec[0] != NULL) {
+        strcpy(rhs, argsSpec[0]);
+    }
 
 }
+
+void *pthreadInvoke(void *input) {
+    invokeCmd(((struct invokeCmdArgs*)input)->index, ((struct invokeCmdArgs*)input)->arguments);
+
+    return NULL;
+}
+
 
 
 int main()
@@ -412,13 +437,15 @@ int main()
 
   for (;;) {
     *buf = 0;			// clear old input
+
     printf("%s", "sh33% ");	// prompt
     ourgets(buf);
 
     // seperate this into the cmd, and whether there are special characters &,|,>
-    if (isSpecialChar(buf) != 0) {
-        parseSpecialCommand(buf, rhs, 1);
-        cout << "Detected special cmd: " << buf << " " << rhs << endl;
+    char opType = isSpecialChar(buf);
+    if (opType != '0') {
+        parseSpecialCommand(buf, rhs, opType);
+        cout << "Detected special cmd: " << buf << opType << rhs << endl;
     } else {
         printf("cmd [%s]\n", buf);
     }
@@ -432,14 +459,77 @@ int main()
     else {
       setArgsGiven(buf, arg, types, nArgsMax);
       int k = findCmd(buf, types);
-      if (k >= 0)
-        invokeCmd(k, arg);
-        // if theres a special character, invoke as part of a chain
-        //invokeCmd(k, arg);
-      else
-	    usage();
+
+      // find command first, if it exists
+      if (k >= 0) {
+
+          switch (opType) {
+            case '0': // normal (no operator)
+                invokeCmd(k, arg);
+                break;
+            case '>': //REDIRECT
+                {
+                // Will change stdOut toward a file specified on the rhs of the '>' operator
+                cout << "REDIRECTING " << buf << "INTO " << rhs << endl;
+                int savedStdout = dup(1); //save stdOut before redirecting
+
+                // create file for writing and set STDOUT
+                ofstream tempFile;
+                tempFile.open(rhs);
+                tempFile.close();
+                int file = open(rhs, O_WRONLY | O_APPEND); //need to check that rhs is actuakly a file
+                dup2(file, 1);
+
+                invokeCmd(k, arg);
+
+                // memory cleanup and STDOUT back to console
+                dup2(savedStdout, 1);
+                close(savedStdout);
+                close(file);
+                break;
+                }
+            case '|': //PIPE
+                {
+                cout << "PIPING" << endl;
+                // execute using invoke cmd on both lhs and rhs
+                pid_t child_pid, wpid;
+                int status = 0;
+
+                child_pid = fork();
+                if (child_pid == 0) {
+                    invokeCmd(k, arg);
+                    exit(child_pid);
+                } else {
+                    while ((wpid = wait(&status)) > 0); //wait for the children to stop playing
+                    cout << " NOW doing parent things " << endl;
+                    setArgsGiven(rhs, arg, types, nArgsMax);
+                    k = findCmd(rhs, types);
+                    invokeCmd(k, arg);
+                }
+
+                break;
+                }
+            case '&': // AMP
+                {
+                cout << "RUN " << buf << " IN BACKGROUND" << endl;
+                pthread_t threadId;
+
+                struct invokeCmdArgs *threadArgs = (struct invokeCmdArgs*)malloc(sizeof(struct invokeCmdArgs));
+                threadArgs->index = k;
+                threadArgs->arguments = arg;
+
+                pthread_create(&threadId, NULL, pthreadInvoke, (void *)threadArgs);
+                pthread_join(threadId, NULL);
+                break;
+                }
+            }
+
+        } else {
+	        usage();
+        }
     }
   }
+  return 0;
 }
 
 // -eof-
