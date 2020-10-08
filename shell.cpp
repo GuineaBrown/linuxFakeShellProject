@@ -422,7 +422,19 @@ void parseSpecialCommand(char* buf, char* rhs, char specialChar) {
 }
 
 void *pthreadInvoke(void *input) {
+
+    for (int i = 0; i < 10009; i++) {
+        continue;
+    }
+
+
     invokeCmd(((struct invokeCmdArgs*)input)->index, ((struct invokeCmdArgs*)input)->arguments);
+
+    return NULL;
+}
+
+void *pthreadSystem(void *input) {
+    system(((char*) input) + 1);
 
     return NULL;
 }
@@ -457,6 +469,7 @@ int main()
 {
   char buf[1024];		// better not type longer than 1023 chars
   char rhs[1024];
+  char bufCopy[1024];
 
   //usage();
 
@@ -466,6 +479,10 @@ int main()
     printf("%s", "sh33% ");	// prompt
     ourgets(buf);
 
+    strcpy(bufCopy, buf);
+
+    char a = buf[strlen(buf) - 1];
+    cout << a << endl;
     // seperate this into the cmd, and whether there are special characters &,|,>
     char opType = isSpecialChar(buf);
     if (opType != '0') {
@@ -476,12 +493,16 @@ int main()
     }
 
     if (buf[0] == 0)
-      continue;
+        continue;
     if (buf[0] == '#')
-      continue;			// this is a comment line, do nothing
-    if (buf[0] == '!')		// begins with !, execute it as
-      system(buf + 1);		// a normal shell cmd
-    else { //it is a normal command
+        continue;			// this is a comment line, do nothing
+
+    if ((buf[0] == '!') && (a != '&')) {
+        cout << "not & here but !" << endl;
+        system(buf + 1);
+
+    } else { //it is a normal command
+        cout << "& detecc" << endl;
       setArgsGiven(buf, arg, types, nArgsMax);
       int k = findCmd(buf, types);
 
@@ -489,7 +510,7 @@ int main()
       remove_extra_whitespaces(rhs, rhs);
 
       // find command first, if it exists
-      if (k >= 0) {
+      if ((k >= 0) || (a == '&')) {
 
           switch (opType) {
             case '0': // normal (no operator)
@@ -534,7 +555,11 @@ int main()
                     close(fd1[0]); // close reading
                     dup2(fd1[1], 1); //redirect STDOUT into the writing end
 
-                    invokeCmd(k, arg);
+                    if (buf[0] == '!')	{	// begins with !, execute it as
+                        system(buf + 1);		// a normal shell cmd
+                    } else {
+                        invokeCmd(k, arg);
+                    }
 
                     exit(child_pid);
                 } else { // parent process
@@ -547,9 +572,13 @@ int main()
                     strcat(rhs, pipeRead);
                     cout << rhs << endl;
 
-                    setArgsGiven(rhs, arg, types, nArgsMax);
-                    k = findCmd(rhs, types);
-                    invokeCmd(k, arg);
+                    if (rhs[0] == '!')	{	// begins with !, execute it as
+                        system(rhs + 1);		// a normal shell cmd
+                    } else {
+                        setArgsGiven(rhs, arg, types, nArgsMax);
+                        k = findCmd(rhs, types);
+                        invokeCmd(k, arg);
+                    }
                 }
 
                 break;
@@ -557,15 +586,19 @@ int main()
             case '&': // AMP
                 {
                 cout << "RUN " << buf << " IN BACKGROUND" << endl;
-                pthread_t threadId;
 
-                struct invokeCmdArgs *threadArgs = (struct invokeCmdArgs*)malloc(sizeof(struct invokeCmdArgs));
-                threadArgs->index = k;
-                threadArgs->arguments = arg;
-
-                pthread_create(&threadId, NULL, pthreadInvoke, (void *)threadArgs);
-                pthread_join(threadId, NULL);
-                break;
+                fflush(NULL);
+                pid_t pid = fork();
+                if (pid == 0) { // child
+                    if (bufCopy[0] == '!')	{	// begins with !, execute it as
+                        system(bufCopy + 1);		// a normal shell cmd
+                    } else {
+                        invokeCmd(k, arg);
+                    }
+                    exit(pid);
+                } else { // parent
+                    continue;
+                }
                 }
             }
 
