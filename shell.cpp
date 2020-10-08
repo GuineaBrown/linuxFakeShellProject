@@ -322,6 +322,7 @@ void invokeCmd(int k, Arg *arg)
 	printf("arg #%d (%s) must be a number.\n", i, arg[i].s);
     }
   }
+
   if (ok)
     (*cmdTable[k].func) (arg);
 }
@@ -426,6 +427,30 @@ void *pthreadInvoke(void *input) {
     return NULL;
 }
 
+void remove_extra_whitespaces(char* input, char* output)
+{
+    int inputIndex = 0;
+    int outputIndex = 0;
+    while(input[inputIndex] != '\0')
+    {
+
+        if(input[inputIndex] == ' ')
+        {
+            while(input[inputIndex + 1] == ' ')
+            {
+                // skip over any extra spaces
+                inputIndex++;
+            }
+        }
+
+        output[outputIndex] = input[inputIndex + 1];
+        outputIndex++;
+        inputIndex++;
+    }
+
+    // null-terminate output
+    output[outputIndex] = '\0';
+}
 
 
 int main()
@@ -456,9 +481,12 @@ int main()
       continue;			// this is a comment line, do nothing
     if (buf[0] == '!')		// begins with !, execute it as
       system(buf + 1);		// a normal shell cmd
-    else {
+    else { //it is a normal command
       setArgsGiven(buf, arg, types, nArgsMax);
       int k = findCmd(buf, types);
+
+      //santise inputs prior
+      remove_extra_whitespaces(rhs, rhs);
 
       // find command first, if it exists
       if (k >= 0) {
@@ -494,14 +522,31 @@ int main()
                 // execute using invoke cmd on both lhs and rhs
                 pid_t child_pid, wpid;
                 int status = 0;
+                int fd1[2]; //file descriptors in these things
+                int fd2[2];
+                //int savedStdout = dup(1);
+
+                pipe(fd1);
+                pipe(fd2);
 
                 child_pid = fork();
-                if (child_pid == 0) {
+                if (child_pid == 0) { //child proces
+                    close(fd1[0]); // close reading
+                    dup2(fd1[1], 1); //redirect STDOUT into the writing end
+
                     invokeCmd(k, arg);
+
                     exit(child_pid);
-                } else {
+                } else { // parent process
                     while ((wpid = wait(&status)) > 0); //wait for the children to stop playing
                     cout << " NOW doing parent things " << endl;
+
+                    char pipeRead[1024];
+                    read(fd1[0], pipeRead, sizeof(pipeRead));
+                    strcat(rhs, " ");
+                    strcat(rhs, pipeRead);
+                    cout << rhs << endl;
+
                     setArgsGiven(rhs, arg, types, nArgsMax);
                     k = findCmd(rhs, types);
                     invokeCmd(k, arg);
